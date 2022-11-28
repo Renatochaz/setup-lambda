@@ -1,5 +1,5 @@
 # Overview
-Easilly deploy a containerized Lambda with ECR.
+Easilly deploy a containerized Lambda with ECR on a LINUX distribution.
 
 # Requirements
 AWS CLI
