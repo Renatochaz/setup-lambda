@@ -1,13 +1,16 @@
 
 resource "null_resource" "registry_login" {
+  count = local.image_tag_exists ? 0 : 1
+
   provisioner "local-exec" {
     command = "aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${local.target_registry}"
   }
 }
 
 resource "null_resource" "build_image" {
+  count = local.image_tag_exists ? 0 : 1
   triggers = {
-    order = null_resource.registry_login.id
+    order = null_resource.registry_login[count.index].id
   }
 
   provisioner "local-exec" {
@@ -16,8 +19,9 @@ resource "null_resource" "build_image" {
 }
 
 resource "null_resource" "push_image" {
+  count = local.image_tag_exists ? 0 : 1
   triggers = {
-    order = null_resource.build_image.id
+    order = null_resource.build_image[count.index].id
   }
 
   provisioner "local-exec" {
@@ -26,8 +30,9 @@ resource "null_resource" "push_image" {
 }
 
 resource "null_resource" "registry_logout" {
+  count = local.image_tag_exists ? 0 : 1
   triggers = {
-    order = null_resource.push_image.id
+    order = null_resource.push_image[count.index].id
   }
 
   provisioner "local-exec" {
@@ -38,9 +43,10 @@ resource "null_resource" "registry_logout" {
 module "ecr" {
   source = "terraform-aws-modules/ecr/aws"
 
-  repository_name = var.ecr_name
+  repository_name          = var.ecr_name
   create_repository_policy = false
   attach_repository_policy = false
+  repository_force_delete  = true
 
   repository_read_write_access_arns = ["arn:aws:iam::012345678901:role/terraform"]
   repository_lifecycle_policy = jsonencode({
@@ -65,8 +71,8 @@ module "ecr" {
 module "lambda_function_container_image" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "${var.lambda_name}"
-  description   = "${var.lambda_description}"
+  function_name = var.lambda_name
+  description   = var.lambda_description
 
   create_package = false
 

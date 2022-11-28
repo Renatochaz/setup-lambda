@@ -1,4 +1,4 @@
-## ttt
+#!make
 os       ?= $(shell uname|tr A-Z a-z)
 ifeq ($(shell uname -m),x86_64)
   arch   ?= "amd64"
@@ -10,11 +10,14 @@ ifeq ($(shell uname -m),aarch64)
   arch   ?= "arm"
 endif
 
-include .env
-export $(shell sed 's/=.*//' .env)
+include envfile
+export $(shell sed 's/=.*//' envfile)
 
-init:
-	@cd ecr && terraform init && terraform fmt
+deploy:
+	@cd _terraform && terraform init && terraform validate && terraform fmt -recursive && terraform apply -auto-approve
 
 plan:
-	@cd ecr && terraform fmt && terraform plan
+	@cd _terraform && terraform init && terraform fmt -recursive && terraform plan
+
+destroy:
+	@cd _terraform && terraform destroy -auto-approve

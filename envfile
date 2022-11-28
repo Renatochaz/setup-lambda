@@ -1,0 +1,5 @@
+TF_VAR_ecr_name=test_ecr
+TF_VAR_region=us-east-1
+TF_VAR_image_tag=3
+TF_VAR_lambda_name=test_lambda
+TF_VAR_lambda_description=Some test description.

@@ -10,15 +10,15 @@ variable "region" {
 
 variable "image_tag" {
   description = "Tag of the image to be deployed"
-  type = string
+  type        = string
 }
 
 variable "lambda_name" {
   description = "Name of the Lambda function"
-  type = string
+  type        = string
 }
 
 variable "lambda_description" {
   description = "Description of the Lambda function"
-  type = string
+  type        = string
 }
